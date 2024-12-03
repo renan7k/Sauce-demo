@@ -40,7 +40,17 @@ describe('Testes referente a página de Login', () => {
             .should('be.visible')
             .and('contain','Epic sadface: Username and password do not match any user in this service')
     })
-    it('', () => {
-        
+    it('Verificar login com sucesso', () => {
+        cy.login(Cypress.env('userStandard'), Cypress.env('password'))
+        cy.get('.app_logo')
+            .should('be.visible')
+            .and('contain','Swag Labs')
+        cy.title().should('be.equal', 'Swag Labs')
+    })
+    it('Verificar login simulando lentidão', () => {
+        cy.login(Cypress.env('userPerform'), Cypress.env('password'))
+        cy.get('.app_logo')
+            .should('be.visible')
+            .and('contain','Swag Labs')
     })
 })
