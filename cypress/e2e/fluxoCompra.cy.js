@@ -66,6 +66,8 @@ describe ('Testes referente a funcionalidade do fluxo de compra', () => {
         cy.get('#shopping_cart_container').click()
         cy.get('#checkout').click()
 
+        cy.url().should('eq', 'https://www.saucedemo.com/checkout-step-one.html')
+
         cy.get('.title')
             .should('have.text', 'Checkout: Your Information')
             .and('be.visible')
@@ -93,9 +95,7 @@ describe ('Testes referente a funcionalidade do fluxo de compra', () => {
         cy.get('#shopping_cart_container').click()
         cy.get('#checkout').click()
 
-        cy.get('#last-name').type('Silva')
-        cy.get('#postal-code').type('06789543')
-        cy.get('#continue').click()
+        cy.checkout('', 'Conceição', '06741532')
 
         cy.get('.error-message-container')
             .should('be.visible')
@@ -103,15 +103,13 @@ describe ('Testes referente a funcionalidade do fluxo de compra', () => {
         cy.get('#first-name').should('have.css', 'border-bottom-color', 'rgb(226, 35, 26)')
 
      })
-     it('Verificar mensagem de erro ao não preencher o first name na tela de checkout', () => {
+     it('Verificar mensagem de erro ao não preencher o last name na tela de checkout', () => {
         cy.login(Cypress.env('userStandard'), Cypress.env('password'))
         cy.addProducts()
         cy.get('#shopping_cart_container').click()
         cy.get('#checkout').click()
 
-        cy.get('#first-name').type('Silva')
-        cy.get('#postal-code').type('06789543')
-        cy.get('#continue').click()
+        cy.checkout('Fabio', '', '06741532')
 
         cy.get('.error-message-container')
             .should('be.visible')
@@ -119,20 +117,76 @@ describe ('Testes referente a funcionalidade do fluxo de compra', () => {
         cy.get('#last-name').should('have.css', 'border-bottom-color', 'rgb(226, 35, 26)')
 
      })
-     it.only('Verificar mensagem de erro ao não preencher o first name na tela de checkout', () => {
+     it('Verificar mensagem de erro ao não preencher o post code na tela de checkout', () => {
         cy.login(Cypress.env('userStandard'), Cypress.env('password'))
         cy.addProducts()
         cy.get('#shopping_cart_container').click()
         cy.get('#checkout').click()
 
-        cy.get('#first-name').type('Adenor')
-        cy.get('#last-name').type('Silva')
-        cy.get('#continue').click()
+        cy.checkout('Fabio', 'Augusto', '')
 
         cy.get('.error-message-container')
             .should('be.visible')
             .and('contain','Error: Postal Code is required')
         cy.get('#postal-code').should('have.css', 'border-bottom-color', 'rgb(226, 35, 26)')
 
+     })
+     it('Verificar redirecionamento para tela de pagamento após prenchimentos dos dados de ckeckout', () => {
+        cy.login(Cypress.env('userStandard'), Cypress.env('password'))
+        cy.addProducts()
+        cy.get('#shopping_cart_container').click()
+        cy.get('#checkout').click()
+
+        cy.checkout('Adenor', 'Silvano', '06789430')
+
+        cy.url().should('eq', 'https://www.saucedemo.com/checkout-step-two.html');
+        //cy.url().should('include', 'parte-da-url');
+
+        cy.get('.title')
+            .should('have.text', 'Checkout: Overview')
+            .and('be.visible')
+     }) 
+
+     it('Verificar funcionamento do botão Cancel na tela de pagamento', () => {
+        cy.login(Cypress.env('userStandard'), Cypress.env('password'))
+        cy.addProducts()
+        cy.get('#shopping_cart_container').click()
+        cy.get('#checkout').click()
+
+        cy.checkout('Adenor', 'Silvano', '06789430')
+        cy.get('#cancel').click()
+
+        cy.url().should('eq','https://www.saucedemo.com/inventory.html')
+     }) 
+
+     it('Verificar compra realizada com sucesso', () => {
+        cy.login(Cypress.env('userStandard'), Cypress.env('password'))
+        cy.addProducts()
+        cy.get('#shopping_cart_container').click()
+        cy.get('#checkout').click()
+
+        cy.checkout('Adenor', 'Silvano', '06789430')
+        cy.get('#finish').click()
+
+        cy.url().should('eq','https://www.saucedemo.com/checkout-complete.html')
+        cy.contains('Checkout: Complete').should('be.visible')
+
+        cy.get('[data-test="complete-header"]')
+            .should('have.text', 'Thank you for your order!')
+
+        cy.get('[data-test="complete-text"]')
+            .should('have.text', 'Your order has been dispatched, and will arrive just as fast as the pony can get there!')
+     })
+     it('Verificar funcionamento do botão Back Home', () => {
+        cy.login(Cypress.env('userStandard'), Cypress.env('password'))
+        cy.addProducts()
+        cy.get('#shopping_cart_container').click()
+        cy.get('#checkout').click()
+
+        cy.checkout('Adenor', 'Silvano', '06789430')
+        cy.get('#finish').click()
+        cy.get('#back-to-products').click()
+
+        cy.url().should('eq','https://www.saucedemo.com/inventory.html')
      })
 })
