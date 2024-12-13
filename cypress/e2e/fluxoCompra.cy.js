@@ -72,6 +72,14 @@ describe ('Testes referente a funcionalidade do fluxo de compra', () => {
             .should('have.text', 'Checkout: Your Information')
             .and('be.visible')
      })
+     it('Verificar funcionamento do botão "Continue Shopping" no carrinho', () => {
+        cy.login(Cypress.env('userStandard'), Cypress.env('password'))
+        cy.addProducts()
+        cy.get('#shopping_cart_container').click()
+        cy.get('#continue-shopping').click()
+
+        cy.url().should('eq','https://www.saucedemo.com/inventory.html')
+     })
      it('Verificar mensagem de erro ao tentar avançar para pagamento sem preenchimento dos campos ', () => {
         cy.login(Cypress.env('userStandard'), Cypress.env('password'))
         cy.addProducts()
@@ -129,6 +137,17 @@ describe ('Testes referente a funcionalidade do fluxo de compra', () => {
             .should('be.visible')
             .and('contain','Error: Postal Code is required')
         cy.get('#postal-code').should('have.css', 'border-bottom-color', 'rgb(226, 35, 26)')
+
+     })
+     it('Verificar funcionamento do botão "Cancel" na tela de checkout', () => {
+        cy.login(Cypress.env('userStandard'), Cypress.env('password'))
+        cy.addProducts()
+        cy.get('#shopping_cart_container').click()
+        cy.get('#checkout').click()
+        cy.get('#cancel').click()
+
+        cy.contains('Your Cart').should('be.visible')
+        cy.url().should('eq','https://www.saucedemo.com/cart.html')
 
      })
      it('Verificar redirecionamento para tela de pagamento após prenchimentos dos dados de ckeckout', () => {
